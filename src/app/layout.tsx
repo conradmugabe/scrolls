@@ -1,7 +1,10 @@
-import { cn } from "@/utils/cn-utils";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
+import "react-loading-skeleton/dist/skeleton.css";
+
+import { cn } from "@/utils/cn-utils";
 import { NavBar } from "@/components/compound/nav-bar";
 import { Providers } from "@/components/providers";
 

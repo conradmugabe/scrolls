@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
+
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 import { db } from "@/db";
-import { Dashboard } from "@/components/compound/dashboard";
+import { Dashboard } from "@/components/compound/dashboard/dashboard";
 
 export default async function DashboardPage() {
   const { getUser } = getKindeServerSession();
