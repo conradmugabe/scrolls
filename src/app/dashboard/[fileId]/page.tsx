@@ -18,5 +18,5 @@ export default async function Page({ params: { fileId } }: Props) {
 
   if (!file) notFound();
 
-  return <div>{fileId}</div>;
+  return <div className="flex-1 justify-between">{fileId}</div>;
 }
