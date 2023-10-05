@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 import Skeleton from "react-loading-skeleton";
 
@@ -10,7 +10,21 @@ import { trpc } from "@/app/_trpc/client";
 import { Files } from "./files";
 
 export function Dashboard() {
+  const [deletingFile, setDeletingFile] = useState<string | null>(null);
+
+  const utils = trpc.useContext();
   const { data: files } = trpc.getUserFiles.useQuery();
+  const { mutate: deleteFile, isLoading } = trpc.deleteFile.useMutation({
+    onSuccess: () => {
+      utils.getUserFiles.invalidate();
+    },
+    onMutate: ({ id }) => {
+      setDeletingFile(id);
+    },
+    onSettled: () => {
+      setDeletingFile(null);
+    },
+  });
 
   return (
     <MaxWidthWrapper>
@@ -19,7 +33,13 @@ export function Dashboard() {
         <UploadButton />
       </div>
       <Suspense fallback={<Skeleton count={3} height={100} className="my-2" />}>
-        {files && <Files files={files} />}
+        {files && (
+          <Files
+            files={files}
+            deleteFile={deleteFile}
+            deletingFile={deletingFile}
+          />
+        )}
       </Suspense>
     </MaxWidthWrapper>
   );
