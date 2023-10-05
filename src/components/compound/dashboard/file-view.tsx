@@ -20,7 +20,7 @@ export type IFile = {
 type Props = {
   deleteFile: ({ id }: { id: string }) => void;
   file: IFile;
-  deletingFile: string;
+  deletingFile: string | null;
 };
 
 export function FileView({ deleteFile, file, deletingFile }: Props) {

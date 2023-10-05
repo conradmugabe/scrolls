@@ -4,7 +4,7 @@ import { FileView, IFile } from "./file-view";
 type Props = {
   deleteFile: ({ id }: { id: string }) => void;
   files: IFile[];
-  deletingFile: string;
+  deletingFile: string | null;
 };
 
 export function Files({ deleteFile, files, deletingFile }: Props) {
