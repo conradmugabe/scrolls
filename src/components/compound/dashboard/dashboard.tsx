@@ -6,17 +6,23 @@ import Skeleton from "react-loading-skeleton";
 
 import { MaxWidthWrapper } from "@/components/common/max-width-wrapper";
 import { UploadButton } from "@/components/compound/upload-button";
+import { useToast } from "@/components/common/toast/use-toast";
 import { trpc } from "@/app/_trpc/client";
 import { Files } from "./files";
 
 export function Dashboard() {
+  const { toast } = useToast();
   const [deletingFile, setDeletingFile] = useState<string | null>(null);
 
   const utils = trpc.useContext();
   const { data: files } = trpc.getUserFiles.useQuery();
-  const { mutate: deleteFile, isLoading } = trpc.deleteFile.useMutation({
+  const { mutate: deleteFile } = trpc.deleteFile.useMutation({
     onSuccess: () => {
       utils.getUserFiles.invalidate();
+      return toast({
+        description: "Successfully deleted file",
+        className: "text-green-600 bg-green-50",
+      });
     },
     onMutate: ({ id }) => {
       setDeletingFile(id);

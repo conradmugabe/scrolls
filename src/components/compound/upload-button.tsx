@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import Dropzone from "react-dropzone";
-import { Cloud, File } from "lucide-react";
+import { Cloud, File, Loader2 } from "lucide-react";
 
 import {
   Dialog,
@@ -14,12 +14,23 @@ import { Button } from "@/components/common/button";
 import { Progress } from "@/components/common/progress";
 import { useUploadThing } from "@/utils/upload-thing";
 import { useToast } from "@/components/common/toast/use-toast";
+import { trpc } from "@/app/_trpc/client";
+import { useRouter } from "next/navigation";
 
 function UploadDropzone() {
+  const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { toast } = useToast();
   const { startUpload } = useUploadThing("pdfUploader");
+
+  const { mutate: startPolling } = trpc.getFile.useMutation({
+    onSuccess: (file) => {
+      router.push(`/dashboard/${file.id}`);
+    },
+    retry: true,
+    retryDelay: 500,
+  });
 
   function startSimulatedProgress() {
     setUploadProgress(0);
@@ -65,6 +76,7 @@ function UploadDropzone() {
 
         clearInterval(progressInterval);
         setUploadProgress(100);
+        startPolling({ key });
       }}
     >
       {({ acceptedFiles, getInputProps, getRootProps }) => (
@@ -101,8 +113,21 @@ function UploadDropzone() {
                     value={uploadProgress}
                     className="h-1 w-full bg-zinc-200"
                   />
+                  {uploadProgress === 100 ? (
+                    <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Redirecting...
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
+
+              <input
+                {...getInputProps()}
+                type="text"
+                id="dropzone-file"
+                className="hidden"
+              />
             </label>
           </div>
         </div>

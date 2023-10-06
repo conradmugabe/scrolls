@@ -60,7 +60,6 @@ export function FileView({ deleteFile, file, deletingFile }: Props) {
           ) : (
             <Trash className="h-4 w-4" />
           )}
-          <Trash className="h-4 w-4" />
         </Button>
       </div>
     </li>
