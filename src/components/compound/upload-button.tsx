@@ -112,6 +112,9 @@ function UploadDropzone() {
                   <Progress
                     value={uploadProgress}
                     className="h-1 w-full bg-zinc-200"
+                    indicatorClassName={
+                      uploadProgress === 100 ? "bg-green-500" : ""
+                    }
                   />
                   {uploadProgress === 100 ? (
                     <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
