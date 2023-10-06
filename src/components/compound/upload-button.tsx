@@ -12,10 +12,14 @@ import {
 } from "@/components/common/dialog";
 import { Button } from "@/components/common/button";
 import { Progress } from "@/components/common/progress";
+import { useUploadThing } from "@/utils/upload-thing";
+import { useToast } from "@/components/common/toast/use-toast";
 
 function UploadDropzone() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const { toast } = useToast();
+  const { startUpload } = useUploadThing("pdfUploader");
 
   function startSimulatedProgress() {
     setUploadProgress(0);
@@ -38,8 +42,27 @@ function UploadDropzone() {
       onDrop={async (acceptedFiles) => {
         setIsUploading(true);
         const progressInterval = startSimulatedProgress();
-        // handle file upload
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const response = await startUpload(acceptedFiles);
+        if (!response) {
+          return toast({
+            title: "Something went wrong",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+        }
+
+        const [fileResponse] = response;
+        const key = fileResponse.key;
+
+        if (!key) {
+          return toast({
+            title: "Something went wrong",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+        }
+
         clearInterval(progressInterval);
         setUploadProgress(100);
       }}
