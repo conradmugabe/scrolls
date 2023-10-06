@@ -10,7 +10,13 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useResizeDetector } from "react-resize-detector";
-import { ChevronDown, ChevronUp, Loader2, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  RotateCw,
+  Search,
+} from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -24,24 +30,20 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from "@/components/common/dropdown-menu";
+import { LoadingView, PDFFullScreen } from "./pdf-full-screen";
 
 type Props = {
   url: string;
 };
-
-function LoadingView() {
-  return (
-    <div className="flex justify-center">
-      <Loader2 className="my-24 h-6 w-6 animate-spin" />
-    </div>
-  );
-}
 
 export function PDFRenderer({ url }: Props) {
   const { toast } = useToast();
   const [numberOfPages, setNumberOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [renderedScale, setRenderedScale] = useState<number | null>(null);
+  const isLoading = renderedScale !== scale;
   const { width, ref } = useResizeDetector();
 
   const PageValidator = z.object({
@@ -73,11 +75,8 @@ export function PDFRenderer({ url }: Props) {
             aria-label="previous page"
             variant="ghost"
             onClick={() => {
-              setValue(
-                "page",
-                currentPage - 1 <= 1 ? "1" : String(currentPage - 1),
-              );
               setCurrentPage((prev) => (prev - 1 <= 1 ? 1 : prev - 1));
+              setValue("page", String(currentPage - 1));
             }}
             disabled={currentPage <= 1}
           >
@@ -105,15 +104,10 @@ export function PDFRenderer({ url }: Props) {
             aria-label="next page"
             variant="ghost"
             onClick={() => {
-              setValue(
-                "page",
-                currentPage + 1 > numberOfPages
-                  ? String(numberOfPages)
-                  : String(currentPage + 1),
-              );
               setCurrentPage((prev) =>
                 prev + 1 > numberOfPages ? numberOfPages : prev + 1,
               );
+              setValue("page", String(currentPage + 1));
             }}
             disabled={currentPage >= numberOfPages}
           >
@@ -143,6 +137,16 @@ export function PDFRenderer({ url }: Props) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            aria-label="rotate 90 degrees clockwise"
+            variant="ghost"
+            onClick={() => setRotation((prev) => prev + 90)}
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
+
+          <PDFFullScreen fileUrl={url} />
         </div>
       </div>
       <div className="flex-1 w-full max-h-screen">
@@ -163,11 +167,25 @@ export function PDFRenderer({ url }: Props) {
                 setNumberOfPages(numPages);
               }}
             >
+              {isLoading && renderedScale ? (
+                <Page
+                  key={"@" + renderedScale}
+                  loading={<LoadingView />}
+                  width={width ? width : 1}
+                  pageNumber={currentPage}
+                  scale={scale}
+                  rotate={rotation}
+                />
+              ) : null}
               <Page
+                key={"@" + scale}
+                className={cn(isLoading ? "hidden" : "")}
                 loading={<LoadingView />}
                 width={width ? width : 1}
                 pageNumber={currentPage}
                 scale={scale}
+                rotate={rotation}
+                onRenderSuccess={() => setRenderedScale(scale)}
               />
             </Document>
           </div>
