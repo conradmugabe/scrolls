@@ -2,8 +2,8 @@ import { notFound, redirect } from "next/navigation";
 
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "@/db";
-import { PDFRenderer } from "@/components/compound/pdf-renderer";
-import { ChatWrapper } from "@/components/compound/chat-wrapper";
+import { PDFRenderer } from "@/components/compound/pdf-view";
+import { ChatWrapper } from "@/components/compound/chat-view";
 
 type Props = {
   params: { fileId: string };
