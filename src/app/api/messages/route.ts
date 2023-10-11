@@ -25,4 +25,13 @@ export async function POST(request: NextRequest) {
     where: { id: parsedBody.data.fileId, userId: user.id },
   });
   if (!file) return NextResponse.json("NOT_FOUND", { status: 404 });
+
+  await db.message.create({
+    data: {
+      isUserMessage: true,
+      text: parsedBody.data.message,
+      fileId: file.id,
+      userId: user.id,
+    },
+  });
 }
