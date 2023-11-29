@@ -1,4 +1,10 @@
-import { ChangeEvent, PropsWithChildren, createContext, useState } from "react";
+import {
+  ChangeEvent,
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 
 import { useMutation } from "@tanstack/react-query";
 
@@ -17,6 +23,11 @@ const ChatContext = createContext<ChatContextProps>({
   handleInputChange: () => {},
   isLoading: false,
 });
+
+export const useChat = () => {
+  const context = useContext(ChatContext);
+  return context;
+};
 
 type Props = {
   fileId: string;
