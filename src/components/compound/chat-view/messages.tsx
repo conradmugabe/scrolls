@@ -3,12 +3,15 @@ import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
 import { Loader2, MessageSquare } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { Message } from "./message";
+import { useChat } from "./chat-context";
 
 type Props = {
   fileId: string;
 };
 
 export function Messages({ fileId }: Props) {
+  const { isLoading: isAiThinking } = useChat();
+
   const { data, isLoading, fetchNextPage } =
     trpc.getFileMessages.useInfiniteQuery(
       {
@@ -35,7 +38,7 @@ export function Messages({ fileId }: Props) {
   };
 
   const combinedMessages = [
-    ...(true ? [loadingMessages] : []),
+    ...(isAiThinking ? [loadingMessages] : []),
     ...(messages ?? []),
   ];
 
