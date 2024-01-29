@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { createUploadthing } from "uploadthing/next";
+import type { FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { PineconeStore } from "langchain/vectorstores/pinecone";
@@ -31,11 +32,13 @@ export const ourFileRouter = {
       });
 
       try {
-        const response = await fetch(url);
+        const response = await fetch(`https://utfs.io/f/${file.key}`);
         const blob = await response.blob();
 
         const pdfLoader = new PDFLoader(blob);
+        console.log(`[LOCAL]: pdf loader reached`);
         const pageLevelDocs = await pdfLoader.load();
+        console.log(`[LOCAL]: page level docs reached`);
         const numberOfPages = pageLevelDocs.length;
 
         console.log(`Loaded ${numberOfPages} pages`);

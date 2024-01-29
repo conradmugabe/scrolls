@@ -1,8 +1,9 @@
+import { useRef } from "react";
+
 import { SendIcon } from "lucide-react";
 
 import { Button } from "@/components/common/button";
 import { Textarea } from "@/components/common/text-area";
-import { useContext, useRef } from "react";
 import { useChat } from "./chat-context";
 
 type Props = {
@@ -30,6 +31,7 @@ export function ChatInput({ isDisabled }: Props) {
                 onChange={handleInputChange}
                 value={message}
                 onKeyDown={(e) => {
+                  if (!message) return;
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     addMessage();
@@ -40,7 +42,7 @@ export function ChatInput({ isDisabled }: Props) {
               <Button
                 aria-label="send message"
                 className="absolute bottom-1.5 right-[8px]"
-                disabled={isLoading || isDisabled}
+                disabled={isLoading || isDisabled || !message}
                 onClick={() => {
                   addMessage();
                   textareaRef.current?.focus();
